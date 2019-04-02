@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from util.util import *
 from Compressor import Compressor
 from PIL import Image
