@@ -1,6 +1,6 @@
 import numpy as np
 
-from PIL import Image
+from PIL import Image, ImageOps
 from typing import List, Tuple
 from mif import Mif
 from sklearn.cluster import MiniBatchKMeans
@@ -18,9 +18,6 @@ class Compressor:
         :return: The resultant color MIF file for the images and the new, color compressed images
         """
         colors = [pix for im in images for pix in im.getdata()]
-
-        # reduce(lambda res, head: res.append(tuple(map(lambda x: x[1], head.getcolors(head.size[0]*head.size[1])))),
-        #        images, colors)
         model = Compressor.get_model(colors, limit)
         colorMif = Mif(width=24)
         for color in {tuple(x) for x in model.cluster_centers_}:
@@ -73,16 +70,15 @@ class Compressor:
             exit(1)
         new_data = np.zeros(im.size, dtype=(np.uint8, 3))
         cols, rows = im.size
-        for col in range(0, cols, cluster_size):
-            for row in range(0, rows, cluster_size):
+        for row in range(0, rows, cluster_size):
+            for col in range(0, cols, cluster_size):
                 pixel_value = Compressor.sample_image(im, col, row, cluster_size)
                 c_bound = min(col + cluster_size, cols)
                 r_bound = min(row + cluster_size, rows)
                 for r in range(row, r_bound):
                     for c in range(col, c_bound):
                         new_data[c][r] = pixel_value
-
-        return Image.fromarray(new_data, mode="RGB")
+        return ImageOps.mirror(Image.fromarray(new_data, mode="RGB").rotate(-90, expand=True))
 
     @classmethod
     def sample_image(cls, im: Image.Image, col: int, row: int, cluster_size: int) -> Tuple[int, int, int]:
