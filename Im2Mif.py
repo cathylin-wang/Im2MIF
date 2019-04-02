@@ -1,11 +1,11 @@
-from .util.util import *
-from .Compressor import Compressor
+from util.util import *
+from Compressor import Compressor
 from PIL import Image
-from .mif import Mif
-from .rgb import RGB
-from .MifEntry import MifEntry
+from mif import Mif
+from rgb import RGB
+from MifEntry import MifEntry
 import argparse as ap
-from os.path import basename
+from os.path import basename, dirname
 
 
 class Im2Mif:
@@ -38,15 +38,16 @@ class Im2Mif:
 
 if __name__ == '__main__':
     args = ap.ArgumentParser()
-    args.add_argument('files', nargs='+', help='Path to image files -- for best results, use absolute path',
-                      dest='files')
+    args.add_argument('files', nargs='+', help='Path to image files -- for best results, use absolute path')
     args.add_argument('-c', '--colors', dest='colors', default=32, help='Max allowed colors in the color MIF.'
                                                                         ' Must be between 1 and 1024, inclusive')
     args.add_argument('-p', '--pixel-compression', dest='cluster_size', default=1, help='Pixel window size. Must be '
                                                                                         'less than the size of the '
                                                                                         'image')
     in_ = args.parse_args()
-    if in_.colors <= 0 or in_.colors > 1024:
+    if int(in_.colors) <= 0 or int(in_.colors) > 1024:
         args.print_help()
     else:
-        Im2Mif.convert(files=in_.files, max_colors=in_.colors, cluster_size=in_.cluster_size)
+        by = Im2Mif.convert(files=in_.files, max_colors=int(in_.colors), cluster_size=int(in_.cluster_size))
+        with open('{}/im-mifs.zip'.format(dirname(in_.files[0])), 'w+b') as file:
+            file.write(by.getvalue())

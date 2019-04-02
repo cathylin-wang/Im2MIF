@@ -1,5 +1,5 @@
 from typing import List
-from .MifEntry import MifEntry
+from MifEntry import MifEntry
 import difflib
 
 

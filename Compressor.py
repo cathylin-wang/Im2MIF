@@ -2,9 +2,9 @@ import numpy as np
 
 from PIL import Image
 from typing import List, Tuple
-from .mif import Mif
+from mif import Mif
 from sklearn.cluster import MiniBatchKMeans
-from .rgb import RGB
+from rgb import RGB
 
 
 class Compressor:
